@@ -95,12 +95,12 @@ async def main(bot) -> None:
 
 
 def main_sync() -> None:
-    bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
     global bot_
-    bot_ = bot
-    global server
+    if not bot_:
+        bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
+        bot_ = bot
     # server = Server(main_sync, stop)
-    asyncio.run(main(bot))
+        asyncio.run(main(bot))
 
 
 def run_tread():
@@ -111,7 +111,12 @@ def run_tread():
 
 
 def stop():
-    bot_.close()
+    # bot_.close()
+    # asyncio.run(dp.stop_polling())
+    # thread.terminate()
+    global msgs
+    msgs = []
+    server.msgs = msgs
     Scheduler().scheduler.remove_all_jobs()
 
 
@@ -121,4 +126,4 @@ server: Server = Server(main_sync, stop, msgs)
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 if __name__ == "__main__":
     bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
-    main(bot)
+    asyncio.run(main(bot))

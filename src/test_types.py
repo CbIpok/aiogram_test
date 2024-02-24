@@ -1,4 +1,4 @@
-from datetime import time
+import time
 from threading import Thread
 
 import pyautogui
@@ -33,8 +33,7 @@ def SendMessage(tasks):
 
 class Action:
     def __init__(self, server: Server):
-        self.command_cases = None
-        self.ans_cases = None
+        self.command_cases = []
         self.server: Server = server
 
     @staticmethod
@@ -47,9 +46,11 @@ class Action:
         # nmain.run_tread()
         time.sleep(10)
         SendMessage(commands)
+        print("commands",commands)
         time.sleep(1)
+        ans = list(map(Action.get_test_message, self.server.msgs))
         self.server.stop()
-        return [[msg.text, msg.from_user.id] for msg in self.server.msgs]
+        return ans
 
 
     # list1 = [1, 2, 3]
