@@ -1,2 +1,5 @@
 .idea/
 venv/
+__pycache__/
+bots/bot/alarm/__pycache__
+src/__pycache__

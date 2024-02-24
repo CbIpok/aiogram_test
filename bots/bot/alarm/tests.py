@@ -61,9 +61,12 @@ def get_test_msgs(tasks):
 # print(get_test_msgs(tasks_1))
 # print(get_test_msgs(tasks_2))
 
-commands_list = src.test_tree.commands_list(tree)
-test_out = []
-for commands in commands_list:
-    test_out.append(get_test_msgs(commands))
+# commands_list = src.test_tree.commands_list(tree)
+# test_out = []
+# for commands in commands_list:
+#     test_out.append(get_test_msgs(commands))
+# action.save()
+# print(*test_out, sep="\n")
 
-print(*test_out, sep="\n")
+action.load()
+action.test()
