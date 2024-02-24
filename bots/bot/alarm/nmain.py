@@ -27,13 +27,10 @@ user_id = 536212157
 
 bot_ = None
 
-msgs: [Message] = []
-
 thread = None
 
-
 def log(message):
-    msgs.append(message)
+    server.msgs.append(message)
 
 
 @dp.message(CommandStart())
@@ -114,14 +111,12 @@ def stop():
     # bot_.close()
     # asyncio.run(dp.stop_polling())
     # thread.terminate()
-    global msgs
-    msgs = []
-    server.msgs = msgs
+    server.msgs = []
     Scheduler().scheduler.remove_all_jobs()
 
 
 tasks = dict(note1=Task("note1", send_msg), note2=Task("note2", send_msg))
-server: Server = Server(main_sync, stop, msgs)
+server: Server = Server(main_sync, stop, [])
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 if __name__ == "__main__":
