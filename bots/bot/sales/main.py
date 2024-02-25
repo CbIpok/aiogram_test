@@ -24,6 +24,7 @@ from bots.bot.sales.storage.db_orm import Page, Display
 from src.test_types import Server
 from bots.bot.sales.roles import unknown, user
 import bots.bot.sales.roles
+
 # Bot token can be obtained via https://t.me/BotFather
 TOKEN = "6618135740:AAHTlP0Xe0dS8pUCHzqknGyXBbm1-cXC2bU"
 
@@ -45,6 +46,7 @@ thread = None
 def log(message):
     server.msgs.append(message)
 
+
 # unknown
 
 # @dp.message(CommandStart())
@@ -54,7 +56,6 @@ def log(message):
 # @dp.message(unknown.UnknownStates.name)
 # async def name_handler(message: types.Message, state: FSMContext):
 #     await unknown.name_handler(message, state)
-
 
 
 # async def command_start_handler(message: Message) -> None:
@@ -144,7 +145,7 @@ def main_sync() -> None:
 def create_menus():
     session = sessionmaker(db_orm.engine)
     s = session()
-    for _ in range(1,4):
+    for _ in range(1, 4):
         p = Page()
         p.page_id = _
         p.text = f"shava{_}" + ' count:{product_count}'
@@ -153,18 +154,18 @@ def create_menus():
         p.catigory = "shava"
         s.add(p)
         s.commit()
-    for _ in range(1,4):
+    for _ in range(1, 4):
         p = Page()
-        p.page_id = _+3
+        p.page_id = _ + 3
         p.text = f"eda{_}" + ' count:{product_count}'
         p.image_file_name = f"storage/images/{_}.jpg"
         p.inline_buttons_content_file_name = f"storage/keyboards/menu_chose.conf"
         p.catigory = "eda"
         s.add(p)
         s.commit()
-    for _ in range(1,4):
+    for _ in range(1, 4):
         p = Page()
-        p.page_id = _+6
+        p.page_id = _ + 6
         p.text = f"voda{_}" + ' count:{product_count}'
         p.image_file_name = f"storage/images/{_}.jpg"
         p.inline_buttons_content_file_name = f"storage/keyboards/menu_chose.conf"
@@ -172,15 +173,17 @@ def create_menus():
         s.add(p)
         s.commit()
 
+
 def create_display():
     session = sessionmaker(db_orm.engine)
     s = session()
     for _ in range(0, 3):
         p = Display()
-        p.page_id=_*3 + 1
-        p.menu_id=_ + 1
+        p.page_id = _ + 1
+        p.menu_id = _ + 1
         s.add(p)
         s.commit()
+
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 if __name__ == "__main__":

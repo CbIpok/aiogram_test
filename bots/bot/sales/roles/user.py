@@ -46,11 +46,13 @@ async def page_handler(message: types.Message, state: FSMContext):
         order = s.query(db_orm.Page).where(db_orm.Page.page_id == order_id.page_id).first()
         # image = open(order.image_file_name, 'rb')
         keys = []
-        for line in json.loads(open(order.inline_buttons_content_file_name).read().format(page_id=order_id.page_id)):
+        for line in json.loads(open(order.inline_buttons_content_file_name).read().format(page_id=order_id.page_id,
+                                                                                          menu_id=order_id.menu_id)):
             buttons = [InlineKeyboardButton(text=name, callback_data=callback_name) for name, callback_name in line]
             keys.append(buttons)
         inline_keyboard = InlineKeyboardMarkup(inline_keyboard=keys)
-        await message.answer_photo(FSInputFile(order.image_file_name), order.text, parse_mode=ParseMode.HTML, reply_markup=inline_keyboard)
+        await message.answer_photo(FSInputFile(order.image_file_name), order.text, parse_mode=ParseMode.HTML,
+                                   reply_markup=inline_keyboard)
     # for page_info in display_parser.get_display():
     #     # async with state.proxy() as storage:
     #     #     page_obj = await render_page(storage, menu_number, 1)
@@ -67,7 +69,9 @@ async def handle_page(menu_number, message, state):
     page_par = page.PageParser(f"storage/pages/menus/menu{menu_number}/page{page_number}.conf")
     page_loaded = page_par.get_page()
     image = open(page_loaded.image_filename, 'rb')
-    await message.answer_photo(image, page_loaded.text, parse_mode=ParseMode.HTML, reply_markup=page_loaded.inline_keyboard)
+    await message.answer_photo(image, page_loaded.text, parse_mode=ParseMode.HTML,
+                               reply_markup=page_loaded.inline_keyboard)
+
 
 @router.message(Command('basket'))
 async def basket_handler(message: types.Message, state: FSMContext):
@@ -81,11 +85,10 @@ async def basket_handler(message: types.Message, state: FSMContext):
             page_loaded = basket_page.get_page()
             await  basket.render_basket_page(data, key)
             await message.answer(page_loaded.text + "Продукт: " + key + " Количество: " + str(value), "HTML",
-                                     reply_markup=page_loaded.inline_keyboard)
+                                 reply_markup=page_loaded.inline_keyboard)
             id_page += 1
     await message.answer("press to submit order", reply_markup=
     InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="submit", callback_data="button_submit")]]))
-
 
 
 # todo splt into moduls like keyboard/handlers/basket.py
@@ -103,7 +106,6 @@ async def buttons(callback_query: types.CallbackQuery, state: FSMContext):
     #  Сделать продукт полностью хранящимся в бд.
     #  Сделать всего 1 универсальный шаблон под любое блюдо.
     #  Блюдо содержит список возможных добавок
-
 
     if name == 'plus' or name == 'minus':
         menu_number = int(callback_query.data.split("_")[2])
@@ -125,7 +127,7 @@ async def buttons(callback_query: types.CallbackQuery, state: FSMContext):
 
         data = await state.get_data()
         order = db_orm.Order(user_id=callback_query.message.chat.id,
-                                 order=json.dumps(data["products"]), order_status="unhandled")
+                             order=json.dumps(data["products"]), order_status="unhandled")
         s.add(order)
         s.commit()
         await callback_query.message.answer(f"order {data['products']} done")
@@ -148,8 +150,6 @@ async def buttons(callback_query: types.CallbackQuery, state: FSMContext):
         data["products"][product]["adds"].append('add')
 
 
-
-
 async def change_keyboard(callback_query, state, keyboard):
     menu_number = int(callback_query.data.split("_")[2])
     data = await state.get_data()
@@ -157,6 +157,7 @@ async def change_keyboard(callback_query, state, keyboard):
     page_obj = await render_page(data, menu_number, page_number, keyboard=keyboard)
     image = open(page_obj.image_filename, 'rb')
     await callback_query.message.edit_caption(caption=page_obj.text, reply_markup=page_obj.inline_keyboard)
+    return page_obj
 
 
 async def render_page(data, menu_number, page_number, keyboard="chose"):
