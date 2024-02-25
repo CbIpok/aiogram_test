@@ -1,6 +1,7 @@
 import json
 
 from aiogram import types
+from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
 from sqlalchemy.orm import sessionmaker
 
@@ -29,7 +30,7 @@ async def buttons(callback_query: types.CallbackQuery, state: FSMContext):
 
         page_obj = await render_basket_page(data, f"product_{page_number}_{menu_number}")
         await callback_query.message.edit_text(
-            page_obj.text, parse_mode="HTML",
+            page_obj.text.encode('utf-8'), parse_mode=ParseMode.HTML,
             reply_markup=page_obj.inline_keyboard)
 
     elif name == 'delete':

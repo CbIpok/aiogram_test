@@ -36,7 +36,7 @@ def log(message):
 
 
 
-@my_router.message(CommandStart())
+@dp.message(CommandStart())
 async def message_handler(message: Message):
     await message.answer('Hello from my router!')
 async def command_start_handler(message: Message) -> None:

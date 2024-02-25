@@ -2,6 +2,7 @@ import json
 # from distutils.cmd import Command
 
 from aiogram import Dispatcher, types, Router
+from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -49,7 +50,7 @@ async def page_handler(message: types.Message, state: FSMContext):
             buttons = [InlineKeyboardButton(text=name, callback_data=callback_name) for name, callback_name in line]
             keys.append(buttons)
         inline_keyboard = InlineKeyboardMarkup(inline_keyboard=keys)
-        await message.answer_photo(FSInputFile(order.image_file_name), order.text, "HTML", reply_markup=inline_keyboard)
+        await message.answer_photo(FSInputFile(order.image_file_name), order.text, parse_mode=ParseMode.HTML, reply_markup=inline_keyboard)
     # for page_info in display_parser.get_display():
     #     # async with state.proxy() as storage:
     #     #     page_obj = await render_page(storage, menu_number, 1)
@@ -66,7 +67,7 @@ async def handle_page(menu_number, message, state):
     page_par = page.PageParser(f"storage/pages/menus/menu{menu_number}/page{page_number}.conf")
     page_loaded = page_par.get_page()
     image = open(page_loaded.image_filename, 'rb')
-    await message.answer_photo(image, page_loaded.text, "HTML", reply_markup=page_loaded.inline_keyboard)
+    await message.answer_photo(image, page_loaded.text, parse_mode=ParseMode.HTML, reply_markup=page_loaded.inline_keyboard)
 
 @router.message(Command('basket'))
 async def basket_handler(message: types.Message, state: FSMContext):
@@ -137,6 +138,16 @@ async def buttons(callback_query: types.CallbackQuery, state: FSMContext):
 
     elif name == "cancel":
         await change_keyboard(callback_query, state, "chose")
+
+    elif name == 'add-product':
+        data = await state.get_data()
+        product_add = callback_query.data.split('-')[-1]
+        product = f"{product_add.split('_')[0]}_{product_add.split('_')[2]}_{product_add.split('_')[1]}"
+        add = product_add.split('_')[3]
+        print(data)
+        data["products"][product]["adds"].append('add')
+
+
 
 
 async def change_keyboard(callback_query, state, keyboard):
