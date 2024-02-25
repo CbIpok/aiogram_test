@@ -1,15 +1,15 @@
 import json
 
 from aiogram import types
-from aiogram.dispatcher import FSMContext
+from aiogram.fsm.context import FSMContext
 from sqlalchemy.orm import sessionmaker
 
-from storage import db_orm
-from utillity.pages import page
+from bots.bot.sales.storage import db_orm
+from bots.bot.sales.utillity.pages import page
 
 
 async def render_basket_page(data, name):
-    page_par = page.PageParser(f"data/pages/basket.conf", product=name,
+    page_par = page.PageParser(f"storage/pages/basket.conf", product=name,
                                var=data["products"][name])
     page_obj = page_par.get_page()
     print(page_obj.inline_buttons_content)

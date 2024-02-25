@@ -10,43 +10,51 @@ from aiogram.types import InlineKeyboardMarkup
 from aiogram.types import Message
 from aiogram.types import WebAppInfo
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-
-router = Router()
-
-
-def get_calendar_keyboard() -> InlineKeyboardMarkup:
-    builder = InlineKeyboardBuilder()
-    builder.row(
-        InlineKeyboardButton(
-            text="Calender",
-            web_app=WebAppInfo(
-                url="https://shitposting.su/",
-            ),
-        )
-    )
-
-    return builder.as_markup(
-        is_persistent=True,
-        resize_keyboard=True,
-    )
+dp = Dispatcher()
+def get_keyboard():
+    buttons = [
+        [
+            InlineKeyboardButton(text="-1", callback_data="num_decr"),
+            InlineKeyboardButton(text="+1", callback_data="num_incr")
+        ],
+        [InlineKeyboardButton(text="Подтвердить", callback_data="num_finish")]
+    ]
+    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+    return keyboard
 
 
-@router.message(Command("start"))
-async def enter_date(message: Message) -> None:
-    await message.answer(
-        text="Calendar",
-        reply_markup=get_calendar_keyboard(),
+async def update_num_text(message: Message, new_value: int):
+    await message.edit_text(
+        f"Укажите число: {new_value}",
+        reply_markup=get_keyboard()
     )
 
 
-@router.message(F.web_app_data)
-async def enter_date(message: Message) -> None:
-    await message.answer("Test")
+@dp.message(Command("numbers"))
+async def cmd_numbers(message: Message):
+    user_data[message.from_user.id] = 0
+    await message.answer("Укажите число: 0", reply_markup=get_keyboard())
 
+
+@dp.callback_query(F.data.startswith("num_"))
+async def callbacks_num(callback: types.CallbackQuery):
+    user_value = user_data.get(callback.from_user.id, 0)
+    action = callback.data.split("_")[1]
+
+    if action == "incr":
+        user_data[callback.from_user.id] = user_value+1
+        await update_num_text(callback.message, user_value+1)
+    elif action == "decr":
+        user_data[callback.from_user.id] = user_value-1
+        await update_num_text(callback.message, user_value-1)
+    elif action == "finish":
+        await callback.message.edit_text(f"Итого: {user_value}")
+
+    await callback.answer()
 
 async def main():
-    dispatcher = Dispatcher()
-    dispatcher.include_router(router)
+    # dispatcher = Dispatcher()
+    # dispatcher.include_router(router)
     await dispatcher.start_polling(
         Bot(token="6618135740:AAHTlP0Xe0dS8pUCHzqknGyXBbm1-cXC2bU"),
         allowed_updates=dispatcher.resolve_used_update_types(),

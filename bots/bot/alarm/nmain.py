@@ -23,24 +23,22 @@ TOKEN = "6618135740:AAHTlP0Xe0dS8pUCHzqknGyXBbm1-cXC2bU"
 # All handlers should be attached to the Router (or Dispatcher)
 
 dp = Dispatcher()
-my_router = Router(name="__name__")
-print(dp.sub_routers)
+
 user_id = 536212157
 
 bot_ = None
 
 thread = None
 
-
 def log(message):
     server.msgs.append(message)
 
 
-@dp.message(CommandStart())
+
+
+@my_router.message(CommandStart())
 async def message_handler(message: Message):
     await message.answer('Hello from my router!')
-
-
 async def command_start_handler(message: Message) -> None:
     """
     This handler receives messages with `/start` command
@@ -103,7 +101,7 @@ def main_sync() -> None:
     if not bot_:
         bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
         bot_ = bot
-        # server = Server(main_sync, stop)
+    # server = Server(main_sync, stop)
         asyncio.run(main(bot))
 
 

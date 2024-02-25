@@ -12,7 +12,7 @@ class Page:
     def __init__(self):
         self.text = ""
         self.image_filename = ""
-        self.inline_keyboard = types.InlineKeyboardMarkup()
+        # self.inline_keyboard = types.InlineKeyboardMarkup(inline_keyboard=[[]])
         self.inline_buttons_content = None
 
 
@@ -44,10 +44,10 @@ class PageGenerator(Page):
 class KeyboardGenerator:
     def __init__(self):
         self.inline_buttons_content = [[]]
-        self.inline_keyboard = InlineKeyboardMarkup([[]])
+        self.inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[]])
         self.index = 0
     def init_keyboard(self):
-        self.inline_keyboard = InlineKeyboardMarkup([[]])
+        self.inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[]])
 
     def add_button(self, text: str, callback: str):
         # self.inline_keyboard.add(types.InlineKeyboardButton(text, callback_data=callback))
@@ -67,8 +67,8 @@ class KeyboardGenerator:
 
     def _render(self):
         for line in self.inline_buttons_content:
-            buttons = [types.InlineKeyboardButton(text, callback_data=callback) for text, callback in line]
-            self.inline_keyboard.add(*buttons)
+            buttons = [types.InlineKeyboardButton(text=text, callback_data=callback) for text, callback in line]
+            self.inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[buttons])
 
 
 
@@ -87,11 +87,11 @@ class PageParser(Page):
         self.image_filename = page["image_filename"]
 
         self.inline_buttons_content = json.loads(open(config.get("page", "inline_buttons_content"), "r").read().format(*args, **kwargs))
-        inline_keyboard = types.inline_keyboard.InlineKeyboardMarkup()
+        inline_keyboard = []
         for line in self.inline_buttons_content:
-            buttons = [types.InlineKeyboardButton(name, callback_data=callback_name) for name, callback_name in line]
-            inline_keyboard.add(*buttons)
-        self.inline_keyboard = inline_keyboard
+            buttons = [types.InlineKeyboardButton(text=name, callback_data=callback_name) for name, callback_name in line]
+            inline_keyboard.append(buttons)
+        self.inline_keyboard = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
     def get_page(self) -> Page:
         return self
